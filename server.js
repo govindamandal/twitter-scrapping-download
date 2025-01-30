@@ -70,14 +70,12 @@ app.post("/upload", upload.single("file"), (req, res) => {
         const imageUrls = row["ImageLinks"]?.split('|');
         if (imageUrls) {
           imageUrls.forEach((link, i) => {
-            console.log('imageLink: ', link)
-            console.log('imageLink type ', Boolean(link))
             // create folder to store
             const imageFolder = path.join(DOWNLOAD_FOLDER, row['StatusID']);
             if (!fs.existsSync(imageFolder)) {
               fs.mkdirSync(imageFolder);
             }
-            const fileName = `${row['StatusID']}-image${i + 1}.jpg`;
+            const fileName = path.join(imageFolder,`${row['StatusID']}-image${i + 1}.jpg`);
             downloadImage(link, fileName);
           })
         }
