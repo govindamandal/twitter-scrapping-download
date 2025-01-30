@@ -6,14 +6,15 @@ const path = require("path");
 const fetch = require("node-fetch");
 const csvParser = require("csv-parser");
 const amqp = require("amqplib");
+const { exec } = require("child_process");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const QUEUE_NAME = "twitter_video_queue";
-const DOWNLOAD_FOLDER = path.join(__dirname, "downloads");
+const DATASET_FOLDER = path.join(__dirname, "dataset");
 
-if (!fs.existsSync(DOWNLOAD_FOLDER)) {
-  fs.mkdirSync(DOWNLOAD_FOLDER);
+if (!fs.existsSync(DATASET_FOLDER)) {
+  fs.mkdirSync(DATASET_FOLDER);
 }
 // Configure Multer for file uploads
 const upload = multer({ dest: "uploads/" });
@@ -62,8 +63,13 @@ app.post("/upload", upload.single("file"), (req, res) => {
       }
 
       // Downloading images
-      if (!fs.existsSync(DOWNLOAD_FOLDER)) {
-        fs.mkdirSync(DOWNLOAD_FOLDER);
+      if (!fs.existsSync(DATASET_FOLDER)) {
+        fs.mkdirSync(DATASET_FOLDER);
+      }
+
+      const imgFolder = path.join(DATASET_FOLDER, 'images');
+      if (!fs.existsSync(imgFolder)) {
+        fs.mkdirSync(imgFolder);
       }
 
       if (Boolean(row["ImageLinks"])) {
@@ -71,7 +77,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
         if (imageUrls) {
           imageUrls.forEach((link, i) => {
             // create folder to store
-            const imageFolder = path.join(DOWNLOAD_FOLDER, row['StatusID']);
+            const imageFolder = path.join(imgFolder, row['StatusID']);
             if (!fs.existsSync(imageFolder)) {
               fs.mkdirSync(imageFolder);
             }
@@ -90,4 +96,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+  exec(`rabbitmqctl delete_queue  twitter_video_queue`)
+});

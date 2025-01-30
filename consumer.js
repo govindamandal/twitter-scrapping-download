@@ -6,10 +6,10 @@ const { exec } = require("child_process");
 const cheerio = require("cheerio");
 
 const QUEUE_NAME = "twitter_video_queue";
-const DOWNLOAD_FOLDER = path.join(__dirname, "downloads");
+const DATASET_FOLDER = path.join(__dirname, "dataset");
 
-if (!fs.existsSync(DOWNLOAD_FOLDER)) {
-    fs.mkdirSync(DOWNLOAD_FOLDER);
+if (!fs.existsSync(DATASET_FOLDER)) {
+    fs.mkdirSync(DATASET_FOLDER);
 }
 
 // Function to sanitize filename (max length: 100 characters)
@@ -43,7 +43,11 @@ async function getTwitterVideoUrl(tweetUrl) {
 // Function to download video
 function downloadVideo(videoUrl, fileName, statusId) {
     return new Promise((resolve, reject) => {
-        const videoFolder = path.join(DOWNLOAD_FOLDER, statusId);
+      const vidFolder = path.join(DATASET_FOLDER, 'videos');
+      if (!fs.existsSync(vidFolder)) {
+        fs.mkdirSync(vidFolder);
+      }
+        const videoFolder = path.join(vidFolder, statusId);
         if (!fs.existsSync(videoFolder)) {
           fs.mkdirSync(videoFolder);
         }
