@@ -81,7 +81,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
             if (!fs.existsSync(imageFolder)) {
               fs.mkdirSync(imageFolder);
             }
-            const fileName = path.join(imageFolder,`${row['StatusID']}-image${i + 1}.jpg`);
+            const fileName = path.join(imageFolder,`image${i + 1}.jpg`);
             downloadImage(link, fileName);
           })
         }
