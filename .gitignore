@@ -1,7 +1,5 @@
 node_modules
 .DS_Store
-producer.js
-imgd.js
 downloads
 dataset
 csv-upload/node_modules
