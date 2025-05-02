@@ -9,7 +9,7 @@ const amqp = require("amqplib");
 const { exec } = require("child_process");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 const QUEUE_NAME = "twitter_video_queue";
 const DATASET_FOLDER = path.join(__dirname, "dataset");
 

@@ -6,7 +6,7 @@ export default function App() {
 
   // WebSocket Connection
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:5000");
+    const ws = new WebSocket("ws://localhost:5050");
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "downloaded") {
@@ -21,7 +21,7 @@ export default function App() {
     const formData = new FormData();
     formData.append("file", file);
 
-    await fetch("http://localhost:5000/upload", {
+    await fetch("http://localhost:5050/upload", {
       method: "POST",
       body: formData,
     });
