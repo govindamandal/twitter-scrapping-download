@@ -6,9 +6,10 @@ const path = require("path");
 const fetch = require("node-fetch");
 const csvParser = require("csv-parser");
 const amqp = require("amqplib");
-const { exec } = require("child_process");
+const cors = require("cors");
 
 const app = express();
+app.use(cors({ origin: "*" }));
 const PORT = process.env.PORT || 5050;
 const QUEUE_NAME = "twitter_video_queue";
 const DATASET_FOLDER = path.join(__dirname, "dataset");
@@ -34,7 +35,6 @@ async function connectQueue() {
 connectQueue();
 
 async function downloadImage(url, filename) {
-  console.log('url: govinda: ', url);
   try {
     const response = await fetch(url);
     const buffer = await response.buffer();
@@ -53,13 +53,11 @@ app.post("/upload", upload.single("file"), (req, res) => {
   fs.createReadStream(filePath)
     .pipe(csvParser())
     .on("data", (row) => {
-      const videoUrl = row["VideoLink"]?.replace('x.com', 'twitter.com'); // Extract VideoLink column
-
-      if (videoUrl && videoUrl.startsWith("https://twitter.com")) {
-        channel.sendToQueue(QUEUE_NAME, Buffer.from(videoUrl), { persistent: true });
-        console.log(`Queued: ${videoUrl}`);
+      if (row["VideoLink"]) {
+        channel.sendToQueue(QUEUE_NAME, Buffer.from(row["VideoLink"]), { persistent: true });
+        console.log(`Queued video: ${row["VideoLink"]}`);
       } else {
-        console.warn(`Skipping invalid video URL: ${videoUrl}`);
+        console.warn(`Skipping invalid video URL: ${row["VideoLink"]}`);
       }
 
       // Downloading images
@@ -98,5 +96,4 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
-  exec(`rabbitmqctl delete_queue  twitter_video_queue`)
 });
