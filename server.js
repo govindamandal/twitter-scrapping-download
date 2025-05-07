@@ -75,12 +75,15 @@ app.post("/upload", upload.single("file"), (req, res) => {
         if (imageUrls) {
           imageUrls.forEach((link, i) => {
             // create folder to store
-            const imageFolder = path.join(imgFolder, row['StatusID']);
-            if (!fs.existsSync(imageFolder)) {
-              fs.mkdirSync(imageFolder);
+            const statusId = Number(row['StatusID']);
+            if (!isNaN(statusId)) {
+              const imageFolder = path.join(imgFolder, row['StatusID']);
+              if (!fs.existsSync(imageFolder)) {
+                fs.mkdirSync(imageFolder);
+              }
+              const fileName = path.join(imageFolder,`image${i + 1}.jpg`);
+              downloadImage(link, fileName);
             }
-            const fileName = path.join(imageFolder,`image${i + 1}.jpg`);
-            downloadImage(link, fileName);
           })
         }
       }

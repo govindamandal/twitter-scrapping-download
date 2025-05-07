@@ -1,5 +1,6 @@
 node_modules
 .DS_Store
 downloads
+uploads
 dataset
 csv-upload/node_modules
